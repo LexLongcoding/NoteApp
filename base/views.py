@@ -5,11 +5,14 @@ from .models import Task
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.urls import reverse_lazy
 
+
 from django.contrib.auth.views import LoginView
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
+from .decorators import admin_only, allowed_users
+
 
 class CustomLoginView(LoginView):
     template_name = 'base/login.html'
@@ -53,10 +56,14 @@ class TaskList(LoginRequiredMixin, ListView):
         context['search_input'] = search_input
         return context
 
+
 class TaskDetail(LoginRequiredMixin, DetailView):
     model = Task
     context_object_name = 'task'
     template_name = 'base/task.html'
+    success_url = reverse_lazy('task')
+
+    
 
 class TaskCreate(LoginRequiredMixin, CreateView):
     model = Task
@@ -77,5 +84,7 @@ class DeleteView(LoginRequiredMixin, DeleteView):
     context_object_name = 'task'
     success_url = reverse_lazy('tasks')
 
-
+@admin_only
+def index(request):
+    return render(request, 'base/index.html')
 
